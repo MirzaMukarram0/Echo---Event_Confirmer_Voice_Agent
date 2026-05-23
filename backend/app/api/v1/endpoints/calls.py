@@ -1,7 +1,9 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any, Dict
+
+import structlog
 
 from fastapi import APIRouter, Depends, Response, status
 
@@ -25,6 +27,7 @@ from app.services.scenario_service import ScenarioService
 from app.services.vapi_service import VapiService
 
 router = APIRouter(prefix="/api/v1", tags=["calls"])
+logger = structlog.get_logger(__name__)
 
 
 @router.post("/calls", response_model=InitiateCallResponse, status_code=202)
@@ -43,6 +46,13 @@ async def initiate_call(
         "scenario": request.scenario,
         "phone_number": request.phone_number,
     }
+
+    logger.info(
+        "initiating_call",
+        phone=request.phone_number,
+        scenario=request.scenario,
+    )
+
     vapi_response = await vapi.initiate_call(
         request.phone_number,
         assistant_config,
@@ -52,18 +62,25 @@ async def initiate_call(
     call_id = vapi_response.get("id")
     if not call_id:
         raise CallNotFoundException("Vapi did not return a call id.")
+
     call = CallStatus(
         call_id=call_id,
         status=vapi_response.get("status", "queued"),
         phone_number=request.phone_number,
         scenario=request.scenario,
-        started_at=datetime.utcnow(),
+        started_at=datetime.now(UTC),
     )
     store.save(call)
+
+    logger.info("call_initiated", call_id=call_id, scenario=request.scenario)
+
     return InitiateCallResponse(
         success=True,
         message="Call initiated.",
-        **call.model_dump(),
+        call_id=call.call_id,
+        status=call.status,
+        phone_number=call.phone_number,
+        scenario=call.scenario,
     )
 
 
@@ -82,19 +99,47 @@ async def get_call(
     store: CallStore = Depends(get_call_store),
 ) -> CallStatus:
     cached = store.get(call_id)
-    if cached:
+    
+    # If the call is already in a terminal state, just return the cache
+    if cached and cached.status in ["ended", "failed"]:
         return cached
 
-    vapi_response = await vapi.get_call(call_id)
-    scenario, phone_number = _extract_metadata(vapi_response)
-    if not scenario or not phone_number:
-        raise CallNotFoundException("Call not found.")
-    return CallStatus(
-        call_id=vapi_response.get("id", call_id),
-        status=vapi_response.get("status", "queued"),
-        phone_number=phone_number,
-        scenario=scenario,
-    )
+    # Polling fallback: if webhooks are not configured, poll Vapi for updates
+    try:
+        vapi_response = await vapi.get_call(call_id)
+        status_val = vapi_response.get("status")
+        transcript = vapi_response.get("transcript")
+        cost = vapi_response.get("cost")
+        
+        if cached:
+            updates = {}
+            if status_val: updates["status"] = status_val
+            if transcript: updates["transcript"] = transcript
+            if cost is not None: updates["cost"] = float(cost)
+            
+            if updates:
+                updated_call = store.update_status(call_id, **updates)
+                if updated_call:
+                    return updated_call
+            return cached
+
+        # If not cached at all, create it
+        scenario, phone_number = _extract_metadata(vapi_response)
+        if not scenario or not phone_number:
+            raise CallNotFoundException("Call not found.")
+        return CallStatus(
+            call_id=vapi_response.get("id", call_id),
+            status=status_val or "queued",
+            phone_number=phone_number,
+            scenario=scenario,
+            transcript=transcript,
+            cost=float(cost) if cost is not None else None,
+        )
+    except Exception as e:
+        logger.error("vapi_poll_failed", error=str(e))
+        if cached:
+            return cached
+        raise
 
 
 @router.delete("/calls/{call_id}", status_code=204)
@@ -103,8 +148,9 @@ async def end_call(
     vapi: VapiService = Depends(get_vapi_service),
     store: CallStore = Depends(get_call_store),
 ) -> Response:
+    logger.info("ending_call", call_id=call_id)
     await vapi.end_call(call_id)
-    store.update_status(call_id, status="ended", ended_at=datetime.utcnow())
+    store.update_status(call_id, status="ended", ended_at=datetime.now(UTC))
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 

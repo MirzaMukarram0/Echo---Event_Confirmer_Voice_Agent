@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 
 from app.models.call_store import CallStore
 from app.schemas.call import CallStatus
@@ -13,7 +13,7 @@ def test_call_store_save_and_get() -> None:
         status="queued",
         phone_number="+14155550123",
         scenario="event_registration",
-        started_at=datetime.utcnow(),
+        started_at=datetime.now(UTC),
     )
     store.save(call)
 
@@ -24,7 +24,7 @@ def test_call_store_save_and_get() -> None:
 
 def test_call_store_update_sets_duration() -> None:
     store = CallStore()
-    started_at = datetime.utcnow()
+    started_at = datetime.now(UTC)
     ended_at = started_at + timedelta(seconds=10)
     call = CallStatus(
         call_id="call-2",

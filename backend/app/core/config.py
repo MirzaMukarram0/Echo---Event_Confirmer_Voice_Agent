@@ -19,20 +19,15 @@ class Settings(BaseSettings):
     DEBUG: bool = False
     ENVIRONMENT: str = "production"
 
-    ALLOWED_ORIGINS: List[str] = ["http://localhost:3000"]
+    ALLOWED_ORIGINS: str = "http://localhost:3000"
 
     VAPI_API_KEY: str = ""
     VAPI_BASE_URL: str = "https://api.vapi.ai"
     VAPI_PHONE_NUMBER_ID: str = ""
 
-    @field_validator("ALLOWED_ORIGINS", mode="before")
-    @classmethod
-    def split_origins(cls, value: object) -> List[str]:
-        if isinstance(value, str):
-            return [item.strip() for item in value.split(",") if item.strip()]
-        if isinstance(value, list):
-            return value
-        return []
+    @property
+    def allowed_origins_list(self) -> List[str]:
+        return [item.strip() for item in self.ALLOWED_ORIGINS.split(",") if item.strip()]
 
     @property
     def is_vapi_configured(self) -> bool:

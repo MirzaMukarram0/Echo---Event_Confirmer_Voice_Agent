@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any, Callable, Dict, List
 
 from app.core.exceptions import ScenarioNotFoundException
@@ -242,7 +242,7 @@ def _get_text(config: CallScenarioConfig, key: str, fallback: str) -> str:
 def build_event_registration_config(config: CallScenarioConfig) -> Dict[str, Any]:
     attendee_name = _get_text(config, "attendee_name", "there")
     event_name = _get_text(config, "event_name", "the upcoming event")
-    event_date = _get_text(config, "event_date", datetime.utcnow().date().isoformat())
+    event_date = _get_text(config, "event_date", datetime.now(UTC).date().isoformat())
     organizer_name = _get_text(config, "organizer_name", "the events team")
     event_location = _get_text(config, "event_location", "the team will email details")
     organizer_phone = _get_text(config, "organizer_phone", "")
@@ -338,7 +338,7 @@ def build_lead_qualification_config(config: CallScenarioConfig) -> Dict[str, Any
 def build_appointment_reminder_config(config: CallScenarioConfig) -> Dict[str, Any]:
     client_name = _get_text(config, "client_name", "there")
     appointment_date = _get_text(
-        config, "appointment_date", datetime.utcnow().date().isoformat()
+        config, "appointment_date", datetime.now(UTC).date().isoformat()
     )
     provider_name = _get_text(config, "provider_name", "our team")
     office_phone = _get_text(config, "office_phone", "")
@@ -407,7 +407,7 @@ def build_customer_satisfaction_config(config: CallScenarioConfig) -> Dict[str, 
 def build_payment_followup_config(config: CallScenarioConfig) -> Dict[str, Any]:
     client_name = _get_text(config, "client_name", "there")
     invoice_number = _get_text(config, "invoice_number", "the outstanding invoice")
-    due_date = _get_text(config, "due_date", datetime.utcnow().date().isoformat())
+    due_date = _get_text(config, "due_date", datetime.now(UTC).date().isoformat())
 
     return {
         "name": "Aria",
