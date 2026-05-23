@@ -1,6 +1,6 @@
 "use client";
 
-import type { ScenarioField } from "@/lib/types";
+import type { ScenarioField } from "../lib/types";
 
 interface ScenarioConfiguratorProps {
   fields: ScenarioField[];

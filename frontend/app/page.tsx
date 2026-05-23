@@ -1,7 +1,7 @@
 import { headers } from "next/headers";
 
-import Dashboard from "@/components/Dashboard";
-import type { CallStatus, ScenarioInfo } from "@/lib/types";
+import Dashboard from "../components/Dashboard";
+import type { CallStatus, ScenarioInfo } from "../lib/types";
 
 async function getBaseUrl(): Promise<string> {
   const headersList = await headers();

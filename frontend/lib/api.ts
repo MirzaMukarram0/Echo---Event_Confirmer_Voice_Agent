@@ -3,7 +3,7 @@ import type {
   InitiateCallRequest,
   InitiateCallResponse,
   ScenarioInfo,
-} from "@/lib/types";
+} from "./types";
 
 async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
   const res = await fetch(path, {

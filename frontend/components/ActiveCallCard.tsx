@@ -2,9 +2,9 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import StatusBadge from "@/components/StatusBadge";
-import { api } from "@/lib/api";
-import type { CallStatus, CallStatusType } from "@/lib/types";
+import StatusBadge from "./StatusBadge";
+import { api } from "../lib/api";
+import type { CallStatus, CallStatusType } from "../lib/types";
 
 interface ActiveCallCardProps {
   callId: string | null;

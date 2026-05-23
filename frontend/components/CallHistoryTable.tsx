@@ -2,8 +2,8 @@
 
 import { Fragment, useState } from "react";
 
-import StatusBadge from "@/components/StatusBadge";
-import type { CallStatus } from "@/lib/types";
+import StatusBadge from "./StatusBadge";
+import type { CallStatus } from "../lib/types";
 
 interface CallHistoryTableProps {
   calls: CallStatus[];

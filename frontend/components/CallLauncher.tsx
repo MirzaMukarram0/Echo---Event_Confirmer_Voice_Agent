@@ -2,9 +2,9 @@
 
 import { useMemo, useState } from "react";
 
-import ScenarioConfigurator from "@/components/ScenarioConfigurator";
-import { api } from "@/lib/api";
-import type { ScenarioInfo, ScenarioType } from "@/lib/types";
+import ScenarioConfigurator from "./ScenarioConfigurator";
+import { api } from "../lib/api";
+import type { ScenarioInfo, ScenarioType } from "../lib/types";
 
 interface CallLauncherProps {
   scenarios: ScenarioInfo[];

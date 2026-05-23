@@ -1,6 +1,6 @@
 "use client";
 
-import type { CallStatusType } from "@/lib/types";
+import type { CallStatusType } from "../lib/types";
 
 const statusStyles: Record<CallStatusType, string> = {
   queued: "border-ops-muted/30 bg-ops-muted/20 text-ops-muted",

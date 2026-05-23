@@ -2,11 +2,11 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-import ActiveCallCard from "@/components/ActiveCallCard";
-import CallHistoryTable from "@/components/CallHistoryTable";
-import CallLauncher from "@/components/CallLauncher";
-import { api } from "@/lib/api";
-import type { CallStatus, ScenarioInfo } from "@/lib/types";
+import ActiveCallCard from "./ActiveCallCard";
+import CallHistoryTable from "./CallHistoryTable";
+import CallLauncher from "./CallLauncher";
+import { api } from "../lib/api";
+import type { CallStatus, ScenarioInfo } from "../lib/types";
 
 interface DashboardProps {
   initialScenarios: ScenarioInfo[];
