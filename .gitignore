@@ -1,0 +1,33 @@
+.github/
+.github/skills/
+
+# Environment files
+.env
+.env.*
+!.env.example
+!.env.local.example
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+env/
+*.egg-info/
+dist/
+build/
+
+# Node.js / Next.js
+node_modules/
+.next/
+out/
+*.log
+
+# IDE / OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
