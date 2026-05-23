@@ -24,6 +24,7 @@ class Settings(BaseSettings):
     VAPI_API_KEY: str = ""
     VAPI_BASE_URL: str = "https://api.vapi.ai"
     VAPI_PHONE_NUMBER_ID: str = ""
+    VAPI_WEBHOOK_SECRET: str = ""
 
     @property
     def allowed_origins_list(self) -> List[str]:

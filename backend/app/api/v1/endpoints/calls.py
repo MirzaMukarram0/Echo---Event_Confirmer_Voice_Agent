@@ -8,6 +8,7 @@ import structlog
 from fastapi import APIRouter, Depends, Response, status
 
 from app.api.deps import (
+    call_rate_limiter,
     get_call_store,
     get_scenario_service,
     get_settings_dep,
@@ -30,7 +31,7 @@ router = APIRouter(prefix="/api/v1", tags=["calls"])
 logger = structlog.get_logger(__name__)
 
 
-@router.post("/calls", response_model=InitiateCallResponse, status_code=202)
+@router.post("/calls", response_model=InitiateCallResponse, status_code=202, dependencies=[Depends(call_rate_limiter)])
 async def initiate_call(
     request: InitiateCallRequest,
     vapi: VapiService = Depends(get_vapi_service),

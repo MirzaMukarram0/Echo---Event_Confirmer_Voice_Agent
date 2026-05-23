@@ -1,10 +1,44 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime
+import re
 from typing import Any, Callable, Dict, List
 
 from app.core.exceptions import ScenarioNotFoundException
 from app.schemas.call import CallScenarioConfig, ScenarioField, ScenarioInfo, ScenarioType
+
+
+def sanitize_prompt_input(text: str, max_len: int = 100) -> str:
+    if not text:
+        return ""
+    cleaned = text.strip()
+    
+    # 1. Truncate to maximum length to prevent large payload injections
+    cleaned = cleaned[:max_len]
+    
+    # 2. Flatten multiline inputs to prevent instruction boundaries
+    cleaned = cleaned.replace("\n", " ").replace("\r", " ")
+    
+    # 3. Strip structural delimiters used in prompt engineering and formatting
+    cleaned = re.sub(r"[\[\]\{\}`<>]", "", cleaned)
+    
+    # 4. Check for common prompt injection patterns (case-insensitive) and redact them
+    injection_patterns = [
+        r"ignore\s+(?:all\s+)?(?:previous\s+)?instructions",
+        r"system\s+override",
+        r"you\s+are\s+now",
+        r"developer\s+mode",
+        r"prompt\s+injection",
+        r"stop\s+acting\s+as",
+        r"act\s+as\s+a",
+        r"new\s+role",
+        r"disregard\s+above"
+    ]
+    for pattern in injection_patterns:
+        cleaned = re.compile(pattern, re.IGNORECASE).sub("[redacted]", cleaned)
+        
+    return cleaned
+
 
 ScenarioBuilder = Callable[[CallScenarioConfig], Dict[str, Any]]
 
@@ -236,7 +270,8 @@ def _get_text(config: CallScenarioConfig, key: str, fallback: str) -> str:
     value = getattr(config, key, None)
     if not value:
         return fallback
-    return str(value)
+    # Sanitize prompt input to prevent prompt injection
+    return sanitize_prompt_input(str(value))
 
 
 def build_event_registration_config(config: CallScenarioConfig) -> Dict[str, Any]:

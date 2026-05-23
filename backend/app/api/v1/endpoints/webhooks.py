@@ -5,9 +5,10 @@ from typing import Any, Dict, Set
 
 import structlog
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request, HTTPException
 
-from app.api.deps import get_call_store
+from app.api.deps import get_call_store, get_settings_dep
+from app.core.config import Settings
 from app.models.call_store import CallStore
 from app.schemas.call import WebhookEvent
 
@@ -21,8 +22,16 @@ _processed_events: Set[str] = set()
 @router.post("/webhooks/vapi", status_code=200)
 async def vapi_webhook(
     payload: WebhookEvent,
+    request: Request,
     store: CallStore = Depends(get_call_store),
+    settings: Settings = Depends(get_settings_dep),
 ) -> Dict[str, Any]:
+    if settings.VAPI_WEBHOOK_SECRET:
+        secret = request.headers.get("x-vapi-secret")
+        if secret != settings.VAPI_WEBHOOK_SECRET:
+            logger.warning("webhook_unauthorized", detail="Invalid x-vapi-secret header.")
+            raise HTTPException(status_code=401, detail="Invalid webhook signing secret.")
+
     msg = payload.message
     event_type = msg.get("type")
     call_id = _extract_call_id(msg)

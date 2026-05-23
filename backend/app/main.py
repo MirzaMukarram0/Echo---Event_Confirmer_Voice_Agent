@@ -20,6 +20,9 @@ from app.core.logging import configure_logging
 from app.models.call_store import CallStore
 from app.services.scenario_service import ScenarioService
 from app.services.vapi_service import VapiService
+import structlog
+
+logger = structlog.get_logger(__name__)
 
 
 @asynccontextmanager
@@ -51,9 +54,15 @@ def create_app() -> FastAPI:
 
     @app.exception_handler(VapiException)
     async def vapi_exception_handler(request: Request, exc: VapiException) -> JSONResponse:
+        # Sanitize exception details to avoid leaking internal data structures
         payload = {"detail": str(exc)}
-        if exc.payload:
-            payload["payload"] = exc.payload
+        # Log the full details for debugging, but only return friendly details to clients
+        logger.error(
+            "vapi_exception_raised",
+            detail=str(exc),
+            status_code=exc.status_code,
+            payload=exc.payload,
+        )
         return JSONResponse(status_code=exc.status_code, content=payload)
 
     @app.exception_handler(VapiNotConfiguredException)
