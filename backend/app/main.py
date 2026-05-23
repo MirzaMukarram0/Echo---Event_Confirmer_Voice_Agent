@@ -1,25 +1,46 @@
 from __future__ import annotations
 
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+from app.api.v1.router import api_router
 from app.core.config import get_settings
 from app.core.exceptions import (
     CallNotFoundException,
     InvalidPhoneNumberException,
+    ScenarioNotFoundException,
     VapiException,
     VapiNotConfiguredException,
     VoiceAgentException,
 )
 from app.core.logging import configure_logging
+from app.models.call_store import CallStore
+from app.services.scenario_service import ScenarioService
+from app.services.vapi_service import VapiService
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    settings = get_settings()
+    app.state.call_store = CallStore()
+    app.state.scenario_service = ScenarioService()
+    app.state.vapi_service = VapiService(settings)
+    yield
+    await app.state.vapi_service.aclose()
 
 
 def create_app() -> FastAPI:
     settings = get_settings()
     configure_logging(settings.DEBUG)
 
-    app = FastAPI(title=settings.APP_NAME, version=settings.APP_VERSION)
+    app = FastAPI(
+        title=settings.APP_NAME,
+        version=settings.APP_VERSION,
+        lifespan=lifespan,
+    )
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.ALLOWED_ORIGINS,
@@ -53,11 +74,19 @@ def create_app() -> FastAPI:
     ) -> JSONResponse:
         return JSONResponse(status_code=404, content={"detail": str(exc)})
 
+    @app.exception_handler(ScenarioNotFoundException)
+    async def scenario_not_found_handler(
+        request: Request, exc: ScenarioNotFoundException
+    ) -> JSONResponse:
+        return JSONResponse(status_code=400, content={"detail": str(exc)})
+
     @app.exception_handler(VoiceAgentException)
     async def voice_agent_handler(
         request: Request, exc: VoiceAgentException
     ) -> JSONResponse:
         return JSONResponse(status_code=400, content={"detail": str(exc)})
+
+    app.include_router(api_router)
 
     return app
 

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from app.models.call_store import CallStore
 from app.schemas.call import CallStatus
@@ -25,7 +25,7 @@ def test_call_store_save_and_get() -> None:
 def test_call_store_update_sets_duration() -> None:
     store = CallStore()
     started_at = datetime.utcnow()
-    ended_at = started_at.replace(second=started_at.second + 10)
+    ended_at = started_at + timedelta(seconds=10)
     call = CallStatus(
         call_id="call-2",
         status="in-progress",

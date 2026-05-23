@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any, Callable, Dict, List
 
+from app.core.exceptions import ScenarioNotFoundException
 from app.schemas.call import CallScenarioConfig, ScenarioField, ScenarioInfo, ScenarioType
 
 ScenarioBuilder = Callable[[CallScenarioConfig], Dict[str, Any]]
@@ -22,7 +23,7 @@ class ScenarioService:
     ) -> Dict[str, Any]:
         builder = self._builders.get(scenario)
         if not builder:
-            raise ValueError(f"Unknown scenario: {scenario}")
+            raise ScenarioNotFoundException(f"Unknown scenario: {scenario}")
         return builder(config)
 
     def _register(

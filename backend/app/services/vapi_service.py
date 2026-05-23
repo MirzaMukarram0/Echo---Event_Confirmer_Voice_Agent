@@ -17,13 +17,19 @@ class VapiService:
         )
 
     async def initiate_call(
-        self, phone: str, assistant_config: Dict[str, Any], phone_number_id: str
+        self,
+        phone: str,
+        assistant_config: Dict[str, Any],
+        phone_number_id: str,
+        metadata: Dict[str, Any] | None = None,
     ) -> Dict[str, Any]:
         payload = {
             "assistant": assistant_config,
             "phoneNumberId": phone_number_id,
             "customer": {"number": phone},
         }
+        if metadata:
+            payload["metadata"] = metadata
         response = await self._client.post("/call/phone", json=payload)
         if response.status_code != 201:
             raise VapiException(

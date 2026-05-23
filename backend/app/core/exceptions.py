@@ -26,3 +26,7 @@ class CallNotFoundException(VoiceAgentException):
 
 class InvalidPhoneNumberException(VoiceAgentException):
     pass
+
+
+class ScenarioNotFoundException(VoiceAgentException):
+    pass
