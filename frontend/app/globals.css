@@ -3,25 +3,23 @@
 @tailwind utilities;
 
 :root {
-  --bg-base: #080c14;
-  --bg-surface: #0f1623;
-  --bg-elevated: #162032;
-  --border: #1e2d45;
-  --border-accent: #00c2ff33;
+  --bg-base: #050811;
+  --bg-surface: rgba(15, 22, 35, 0.6);
+  --bg-elevated: rgba(22, 32, 50, 0.7);
+  --border: rgba(0, 194, 255, 0.15);
+  --border-accent: rgba(0, 194, 255, 0.3);
   --text-primary: #e8eff8;
-  --text-secondary: #6b84a3;
+  --text-secondary: #8ba3c2;
   --text-mono: #4dd0ff;
   --accent: #00c2ff;
-  --accent-dim: #005f7a;
-  --status-queued: #6b84a3;
-  --status-active: #22c55e;
-  --status-ended: #94a3b8;
-  --status-failed: #ef4444;
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
-  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --accent-dim: rgba(0, 194, 255, 0.2);
+  
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
 }
 
 * {
@@ -36,30 +34,85 @@ body {
 body {
   margin: 0;
   color: var(--text-primary);
-  background: radial-gradient(1200px 800px at 12% 15%, #11223a 0%, transparent 55%),
-    radial-gradient(1000px 600px at 85% 5%, #0b1a2e 0%, transparent 55%),
-    linear-gradient(180deg, #080c14 0%, #070b12 100%);
+  background-color: var(--bg-base);
   font-family: var(--font-display), sans-serif;
+  overflow-x: hidden;
+}
+
+/* Background Texture Layer */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: 
+    radial-gradient(circle at 15% 50%, rgba(0, 194, 255, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 85% 30%, rgba(0, 95, 122, 0.08) 0%, transparent 50%),
+    linear-gradient(180deg, #050811 0%, #030408 100%);
+  pointer-events: none;
 }
 
 main {
   min-height: 100vh;
 }
 
-@keyframes pulse {
-  0%,
-  100% {
+/* ── Dark-themed native form controls ────────────────────────── */
+
+select option {
+  background: #162032;
+  color: var(--text-primary);
+}
+
+/* Style native date inputs for dark theme */
+.date-input::-webkit-calendar-picker-indicator {
+  filter: invert(0.8) brightness(1.2) sepia(1) hue-rotate(180deg) saturate(3);
+  cursor: pointer;
+}
+
+input[type="date"]::-webkit-datetime-edit {
+  color: var(--text-primary);
+}
+
+input[type="date"]::-webkit-datetime-edit-fields-wrapper {
+  color: var(--text-primary);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 194, 255, 0.2);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 194, 255, 0.4);
+}
+
+/* ── Animations ──────────────────────────────────────────────── */
+
+@keyframes pulse-glow {
+  0%, 100% {
     opacity: 1;
+    box-shadow: 0 0 10px rgba(0, 194, 255, 0.2);
   }
   50% {
-    opacity: 0.3;
+    opacity: 0.8;
+    box-shadow: 0 0 25px rgba(0, 194, 255, 0.6);
   }
 }
 
 @keyframes fadeInUp {
   0% {
     opacity: 0;
-    transform: translateY(12px);
+    transform: translateY(20px);
   }
   100% {
     opacity: 1;
@@ -68,21 +121,44 @@ main {
 }
 
 .pulse-dot {
-  animation: pulse 1.5s var(--ease-in-out) infinite;
+  animation: pulse-glow 2s var(--ease-in-out) infinite;
 }
 
 .fade-in {
-  animation: fadeInUp 600ms var(--ease-out) both;
+  animation: fadeInUp 800ms var(--ease-out) both;
 }
 
 .fade-in-delay-1 {
-  animation-delay: 120ms;
+  animation-delay: 150ms;
 }
 
 .fade-in-delay-2 {
-  animation-delay: 220ms;
+  animation-delay: 300ms;
 }
 
 .fade-in-delay-3 {
-  animation-delay: 320ms;
+  animation-delay: 450ms;
+}
+
+/* Glassmorphism Utilities */
+.glass-panel {
+  background: var(--bg-surface);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+.glass-input {
+  background: rgba(15, 22, 35, 0.4);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: all 0.3s var(--ease-out);
+}
+
+.glass-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 15px rgba(0, 194, 255, 0.15);
+  background: rgba(15, 22, 35, 0.7);
 }
