@@ -2,25 +2,49 @@
 
 import type { CallStatusType } from "../lib/types";
 
-const statusStyles: Record<CallStatusType, string> = {
-  queued: "border-ops-muted/30 bg-ops-muted/20 text-ops-muted",
-  "in-progress": "border-emerald-500/30 bg-emerald-500/20 text-emerald-400",
-  ended: "border-slate-500/30 bg-slate-500/20 text-slate-400",
-  failed: "border-red-500/30 bg-red-500/20 text-red-400",
+interface StatusBadgeConfig {
+  label: string;
+  className: string;
+}
+
+const STATUS_CONFIG: Record<CallStatusType | "no-answer", StatusBadgeConfig> = {
+  "in-progress": {
+    label: "Live",
+    className: "bg-[#052e16] text-[#22c55e] border-[#166534]",
+  },
+  ended: {
+    label: "Ended",
+    className: "bg-[#171717] text-[#737373] border-[#2a2a2a]",
+  },
+  failed: {
+    label: "Failed",
+    className: "bg-[#1c0a0a] text-[#ef4444] border-[#7f1d1d]",
+  },
+  queued: {
+    label: "Queued",
+    className: "bg-[#171717] text-[#a3a3a3] border-[#2a2a2a]",
+  },
+  "no-answer": {
+    label: "No Answer",
+    className: "bg-[#422006] text-[#eab308] border-[#713f12]",
+  },
 };
 
 interface StatusBadgeProps {
-  status: CallStatusType;
+  status: CallStatusType | "no-answer";
 }
 
 export default function StatusBadge({ status }: StatusBadgeProps) {
+  const badge = STATUS_CONFIG[status] || {
+    label: status,
+    className: "bg-[#171717] text-[#737373] border-[#2a2a2a]",
+  };
+
   return (
     <span
-      className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-mono uppercase tracking-[0.2em] ${
-        statusStyles[status]
-      }`}
+      className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded border ${badge.className}`}
     >
-      {status.replace("-", " ")}
+      {badge.label}
     </span>
   );
 }

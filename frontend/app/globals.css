@@ -2,163 +2,73 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --bg-base: #050811;
-  --bg-surface: rgba(15, 22, 35, 0.6);
-  --bg-elevated: rgba(22, 32, 50, 0.7);
-  --border: rgba(0, 194, 255, 0.15);
-  --border-accent: rgba(0, 194, 255, 0.3);
-  --text-primary: #e8eff8;
-  --text-secondary: #8ba3c2;
-  --text-mono: #4dd0ff;
-  --accent: #00c2ff;
-  --accent-dim: rgba(0, 194, 255, 0.2);
-  
-  --radius-sm: 6px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  
-  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
-}
+@layer base {
+  * { box-sizing: border-box; }
 
-* {
-  box-sizing: border-box;
-}
-
-html,
-body {
-  height: 100%;
-}
-
-body {
-  margin: 0;
-  color: var(--text-primary);
-  background-color: var(--bg-base);
-  font-family: var(--font-display), sans-serif;
-  overflow-x: hidden;
-}
-
-/* Background Texture Layer */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  background: 
-    radial-gradient(circle at 15% 50%, rgba(0, 194, 255, 0.08) 0%, transparent 40%),
-    radial-gradient(circle at 85% 30%, rgba(0, 95, 122, 0.08) 0%, transparent 50%),
-    linear-gradient(180deg, #050811 0%, #030408 100%);
-  pointer-events: none;
-}
-
-main {
-  min-height: 100vh;
-}
-
-/* ── Dark-themed native form controls ────────────────────────── */
-
-select option {
-  background: #162032;
-  color: var(--text-primary);
-}
-
-/* Style native date inputs for dark theme */
-.date-input::-webkit-calendar-picker-indicator {
-  filter: invert(0.8) brightness(1.2) sepia(1) hue-rotate(180deg) saturate(3);
-  cursor: pointer;
-}
-
-input[type="date"]::-webkit-datetime-edit {
-  color: var(--text-primary);
-}
-
-input[type="date"]::-webkit-datetime-edit-fields-wrapper {
-  color: var(--text-primary);
-}
-
-/* Scrollbar styling */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgba(0, 194, 255, 0.2);
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 194, 255, 0.4);
-}
-
-/* ── Animations ──────────────────────────────────────────────── */
-
-@keyframes pulse-glow {
-  0%, 100% {
-    opacity: 1;
-    box-shadow: 0 0 10px rgba(0, 194, 255, 0.2);
+  html {
+    font-size: 13px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
-  50% {
-    opacity: 0.8;
-    box-shadow: 0 0 25px rgba(0, 194, 255, 0.6);
+
+  body {
+    background-color: #0a0a0a;
+    color: #e5e5e5;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 13px;
+    line-height: 20px;
   }
-}
 
-@keyframes fadeInUp {
-  0% {
-    opacity: 0;
-    transform: translateY(20px);
+  input, textarea, select {
+    background-color: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    color: #e5e5e5;
+    border-radius: 6px;
+    font-size: 13px;
   }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
+
+  input:focus, textarea:focus {
+    outline: none;
+    border-color: #404040;
+    box-shadow: none;  /* NO glow rings */
   }
+
+  /* Style native date inputs for dark theme */
+  .date-input::-webkit-calendar-picker-indicator {
+    filter: invert(0.8) brightness(1.2);
+    cursor: pointer;
+  }
+
+  input[type="date"]::-webkit-datetime-edit {
+    color: #e5e5e5;
+  }
+
+  input[type="date"]::-webkit-datetime-edit-fields-wrapper {
+    color: #e5e5e5;
+  }
+
+  ::-webkit-scrollbar       { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 2px; }
+  ::-webkit-scrollbar-thumb:hover { background: #404040; }
 }
 
-.pulse-dot {
-  animation: pulse-glow 2s var(--ease-in-out) infinite;
-}
+@layer utilities {
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
 
-.fade-in {
-  animation: fadeInUp 800ms var(--ease-out) both;
-}
+  .animate-pulse-dot {
+    animation: pulse 1.5s infinite;
+  }
 
-.fade-in-delay-1 {
-  animation-delay: 150ms;
-}
+  @keyframes waveform {
+    0%, 100% { transform: scaleY(0.3); opacity: 0.5; }
+    50% { transform: scaleY(1); opacity: 1; }
+  }
 
-.fade-in-delay-2 {
-  animation-delay: 300ms;
-}
-
-.fade-in-delay-3 {
-  animation-delay: 450ms;
-}
-
-/* Glassmorphism Utilities */
-.glass-panel {
-  background: var(--bg-surface);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--border);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-}
-
-.glass-input {
-  background: rgba(15, 22, 35, 0.4);
-  border: 1px solid var(--border);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  transition: all 0.3s var(--ease-out);
-}
-
-.glass-input:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 15px rgba(0, 194, 255, 0.15);
-  background: rgba(15, 22, 35, 0.7);
+  .animate-waveform {
+    animation: waveform 1.2s ease-in-out infinite;
+  }
 }

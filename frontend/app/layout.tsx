@@ -1,21 +1,16 @@
 import type { Metadata } from "next";
-import { DM_Sans, JetBrains_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
 
 import "./globals.css";
 
-const displayFont = DM_Sans({
+const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-display",
-});
-
-const monoFont = JetBrains_Mono({
-  subsets: ["latin"],
-  variable: "--font-mono",
+  variable: "--font-inter",
 });
 
 export const metadata: Metadata = {
-  title: "Echo Voice Agent",
-  description: "Ops dashboard for outbound event confirmation calls.",
+  title: "ARIA — Voice Ops Center",
+  description: "High-density operational dashboard for outbound confirmation automation.",
 };
 
 export default function RootLayout({
@@ -24,8 +19,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${displayFont.variable} ${monoFont.variable}`}>
-      <body suppressHydrationWarning>{children}</body>
+    <html lang="en">
+      <body
+        className={`${inter.variable} font-sans bg-v-base text-v-text antialiased`}
+        suppressHydrationWarning
+      >
+        {children}
+      </body>
     </html>
   );
 }
